@@ -1,5 +1,6 @@
 package fr.umlv.retro.detection;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public class FeaturesDetectorBuilder {
 	
 	public FeaturesDetectorBuilder(ClassNode cn) {
 		this.cn = Objects.requireNonNull(cn);
-		this.recognizers = Set.of();
+		this.recognizers = new HashSet<FeatureRecognizer>();
 	}
 	
 	public FeaturesDetectorBuilder append(FeatureRecognizer recognizer) {

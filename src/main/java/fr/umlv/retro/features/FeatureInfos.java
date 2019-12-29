@@ -4,40 +4,31 @@ import java.util.Objects;
 
 public class FeatureInfos {
 	private final String feature;
-	private final String source;
-	private final String method;
+	private final String classLocation;
+	private final String sourceLocation;
 	private final String details;
-	private final int line;
 	
-	public FeatureInfos(String feature, String source, String method, String details, int line) {
-		if ( line < 0 ) {
-			throw new IllegalArgumentException("Line number can not be negative");
-		}
-		
+	public FeatureInfos(String feature, String classLocation, String sourceLocation, String details) {
 		this.feature = Objects.requireNonNull(feature);
-		this.source = Objects.requireNonNull(source);
-		this.method = Objects.requireNonNull(method);
+		this.classLocation = Objects.requireNonNull(classLocation);
+		this.sourceLocation = Objects.requireNonNull(sourceLocation);
 		this.details = Objects.requireNonNull(details);
-		this.line = line;
 	}
 	
 	public String getName() {
 		return feature;
 	}
 	
-	public String getSource() {
-		return source;
+	public String getClasslocation() {
+		return classLocation;
 	}
 	
-	public String getMethod() {
-		return method;
+	public String getSourcelocation() {
+		return sourceLocation;
 	}
 	
 	public String getDetails() {
 		return details;
 	}
 	
-	public int getLine() {
-		return line;
-	}
 }

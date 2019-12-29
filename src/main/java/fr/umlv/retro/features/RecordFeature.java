@@ -2,10 +2,16 @@ package fr.umlv.retro.features;
 
 import java.util.List;
 
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
-public class RecordFeature implements FeatureTransformer, FeatureRecognizer {
+public class RecordFeature extends AbstractFeature {
+	private final static String FEATURE_NAME = "RECORD";
+
+	public RecordFeature() {
+		super(FEATURE_NAME);
+	}
 
 	@Override
 	public void transformFields(List<FieldNode> fields) {
@@ -20,26 +26,9 @@ public class RecordFeature implements FeatureTransformer, FeatureRecognizer {
 	}
 
 	@Override
-	public String featureName() {
-		return "RECORD";
-	}
-
-	@Override
-	public void analyze(MethodNode cn) {
+	public void analyze(ClassNode cn) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public List<FeatureInfos> getRecognizedFeatures() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 }

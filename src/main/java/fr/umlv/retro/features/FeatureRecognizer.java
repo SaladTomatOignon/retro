@@ -1,12 +1,12 @@
 package fr.umlv.retro.features;
 
-import java.util.List;
+import java.util.stream.Stream;
 
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.ClassNode;
 
 public interface FeatureRecognizer {
 	String featureName();
-	void analyze(MethodNode cn);
-	List<FeatureInfos> getRecognizedFeatures();
+	void analyze(ClassNode cn);
+	Stream<FeatureInfos> getRecognizedFeatures();
 	void clear();
 }
