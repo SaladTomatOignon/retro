@@ -2,6 +2,9 @@ package fr.umlv.retro;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -21,12 +24,10 @@ import fr.umlv.retro.transformation.FeaturesTransformerBuilder;
 import fr.umlv.retro.transformation.Transformer;
 import fr.umlv.retro.util.Files;
 
-/*         /!\ Main non définitif                  */
-
 public class Main {
-	private final static Map<String, Class<?>> featuresMap;
+	private final static Map<String, Class<? extends Feature>> featuresMap;
 	static {
-        Map<String, Class<?>> tmp = new HashMap<String, Class<?>>();
+        Map<String, Class<? extends Feature>> tmp = new HashMap<String, Class<? extends Feature>>();
         tmp.put("try-with-resources", TryWithResourcesFeature.class);
         tmp.put("nestmates", NestMatesFeature.class);
         tmp.put("lambda", LambdaFeature.class);
@@ -35,7 +36,7 @@ public class Main {
         featuresMap = Collections.unmodifiableMap(tmp);
 	}
 	
-	private static Object getFeature(String featureName) {
+	private static Feature getFeature(String featureName) {
 		Objects.requireNonNull(featureName);
 		
 		try {
@@ -43,10 +44,6 @@ public class Main {
 		} catch (Exception e) {
 			throw new IllegalArgumentException(featureName + " : unknown feature");
 		}
-	}
-	
-	private static boolean isDetector(Object feature) {
-		return feature instanceof Detector; /*  <------  Pas de panique on va retirer ça.   */
 	}
 	
 	private static void detectFeatures(ClassNode cn, FeaturesDetector detector) {
@@ -58,7 +55,7 @@ public class Main {
 		detector.clearLogs();
 	}
 	
-	private static void showInfoFile(InputStream file, List<Detector> detectors) throws IOException {
+	private static void showInfoFile(InputStream file, List<? extends Detector> detectors) throws IOException {
 		Objects.requireNonNull(file);
 		Objects.requireNonNull(detectors);
 		
@@ -73,68 +70,54 @@ public class Main {
 		detectFeatures(cn, fd);
 	}
 	
-	private static void showInfosFiles(List<InputStream> files, List<Object> features) throws IOException {
+	private static void showInfosFiles(Collection<InputStream> files, List<Feature> features) throws IOException {
 		Objects.requireNonNull(files);
 		Objects.requireNonNull(features);
 		
-		features.forEach(feature -> {
-			if ( !isDetector(feature)  ) {
-				throw new IllegalArgumentException("This program is not able to detect feature '" + feature + "' for now");
-			}
-		});
-		
 		for (var file : files) {
-			showInfoFile(file, features.stream().map(feature -> (Detector) feature).collect(Collectors.toList()));
+			showInfoFile(file, features);
 		}
 	}
-
-	private static boolean isTransformer(Object feature) {
-		return feature instanceof Transformer; /*  <------  Pas de panique on va retirer ça.   */
-	}
 	
-	private static void transformFeatures(ClassNode cn, FeaturesTransformer transformer, int version) {
+	private static void transformFeatures(ClassNode cn, FeaturesTransformer transformer, int version, boolean force) {
 		Objects.requireNonNull(cn);
 		Objects.requireNonNull(transformer);
 		
-		transformer.transform(version);
+		transformer.transform(version, force);
 	}
 	
-	private static void retroFile(InputStream file, List<Transformer> transformers, int version) throws IOException {
-		Objects.requireNonNull(file);
+	private static void retroFile(Path filePath, InputStream fileResource, List<? extends Transformer> transformers, int version, boolean force) throws IOException {
+		Objects.requireNonNull(filePath);
+		Objects.requireNonNull(fileResource);
 		Objects.requireNonNull(transformers);
 		
 		ClassNode cn = new ClassNode(Opcodes.ASM7);
-		ClassReader cr = new ClassReader(file);
+		ClassReader cr = new ClassReader(fileResource);
 		cr.accept(cn, 0);
 		
 		FeaturesTransformerBuilder ftb = new FeaturesTransformerBuilder(cn);
 		transformers.forEach(detector -> ftb.append(detector));
 		FeaturesTransformer ft = ftb.build();
 		
-		transformFeatures(cn, ft, version);
-		// TODO Ecrire le fichier en sortie
+		transformFeatures(cn, ft, version, force);
+		Files.generateOutputFile(cn, filePath);
 	}
 
-	private static void retroFiles(List<InputStream> files, List<Object> features, int version, boolean force) throws IOException {
+	private static void retroFiles(Map<Path, InputStream> files, List<Feature> features, int version, boolean force) throws IOException {
 		Objects.requireNonNull(files);
 		Objects.requireNonNull(features);
 		
-		features.forEach(feature -> {
-			if ( !isTransformer(feature)  ) {
-				throw new IllegalArgumentException("This program is not able to transform feature '" + feature + "' for now");
-			}
-		});
-		
-		for (var file : files) {
-			retroFile(file, features.stream().map(feature -> (Transformer) feature).collect(Collectors.toList()), version);
+		for (var file : files.entrySet()) {
+			retroFile(file.getKey(), file.getValue(), features, version, force);
 		}
 	}
 
 	public static void main(String[] args) throws IOException {
 /*		var commandLine = ArgsParser.parse(args);
 		var files = Files.getRessourceFiles(commandLine.getArgList());
-		List<Object> features = new ArrayList<Object>();
+		List<Feature> features = new ArrayList<Feature>();
 		
+		// On r�cup�re les features donn�es en arguments.
 		if ( commandLine.hasOption("feature") ) {
 			features = Arrays.stream(commandLine.getOptionValues("feature")).map(Main::getFeature).collect(Collectors.toList());
 		} else {
@@ -143,27 +126,33 @@ public class Main {
 		
 		// On donne uniquement les infos.
 		if ( commandLine.hasOption("info") ) {
-			showInfosFiles(files, features);
+			showInfosFiles(files.values(), features);
 		} else {
-			retroFiles(files, features, Integer.parseInt(commandLine.getOptionValue("target")), commandLine.hasOption("force"));
+			// Sinon on transforme.
+			try {
+				retroFiles(files, features, Integer.parseInt(commandLine.getOptionValue("target")), commandLine.hasOption("force"));
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("target version must be a number");
+			}
 		}
 */
+	
 		
-		/* Partie ligne de commandes pas encore tout à fait opérationnelle :
-		 * Seuls les .class dans le répertoire courant sont analysés et transformés. (les fichiers de sortie ne sont pas encore générés).
+		
+		
+		/* Désolé, pour l'instant le parseur de ligne de commande n'est pas encore fait,
+		 * Merci de renseigner manuellement les valeurs.
 		 */
-		var files = Files.getRessourceFiles(List.of("/"));
-		List<Object> features = featuresMap.keySet().stream().map(Main::getFeature).collect(Collectors.toList());
-		showInfosFiles(files, features);
-		files.forEach(file -> {
-			try {
-				file.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		});
-		files = Files.getRessourceFiles(List.of("/"));
-		retroFiles(files, features, Opcodes.V1_5, true);
+		
+		var files = Files.getRessourceFiles(List.of("/")); // Répertoire où chercher les .class (par défaut repertoire courant)
+		List<Feature> features = Arrays.stream(new String[] {"try-with-resources", "nestmates", "lambda", "concatenation", "record"}).map(Main::getFeature).collect(Collectors.toList()); // Liste des features � retro
+		
+		boolean donner_uniquement_les_infos = true; // Correspond à l'option -infos
+		
+		if ( donner_uniquement_les_infos ) {
+			showInfosFiles(files.values(), features); // Detecter et afficher les features.
+		} else {
+			retroFiles(files, features, Opcodes.V1_5, true); // Transformer les features.
+		}
 	}
 }

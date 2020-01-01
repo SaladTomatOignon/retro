@@ -2,7 +2,7 @@ package fr.umlv.retro.features;
 
 import org.objectweb.asm.tree.ClassNode;
 
-public class RecordFeature extends AbstractFeature {
+public class RecordFeature extends Feature {
 	private final static String FEATURE_NAME = "RECORD";
 
 	public RecordFeature() {

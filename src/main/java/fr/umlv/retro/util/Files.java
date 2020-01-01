@@ -7,9 +7,17 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
+
+import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 
 public class Files {
 	public static boolean isClassOrJarFile(Path path) {
@@ -50,16 +58,31 @@ public class Files {
 		return paths;
 	}
 	
-	public static List<InputStream> getRessourceFiles(List<String> files) {
+	public static Map<Path, InputStream> getRessourceFiles(List<String> files) {
 		Objects.requireNonNull(files);
 		
-		return getUniquePaths(files).stream().map(path -> {
+		return getUniquePaths(files).stream().collect(Collectors.toMap(Function.identity(), path -> {
 			try {
 				return java.nio.file.Files.newInputStream(path);
 			} catch (IOException e) {
 				e.printStackTrace();
-				return null;
+				return InputStream.nullInputStream();
 			}
-		}).filter(file -> !Objects.isNull(file)).collect(Collectors.toList());
+		}));
+	}
+	
+	public static void generateOutputFile(ClassNode cn, Path OriginPath) throws IOException {
+		Objects.requireNonNull(cn);
+		Objects.requireNonNull(OriginPath);
+		Path outputFolder = Paths.get(System.getProperty("user.dir"), "output");
+		
+		ClassWriter cw = new ClassWriter(COMPUTE_MAXS | COMPUTE_FRAMES);
+		cn.accept(cw);
+		
+		if ( !java.nio.file.Files.exists(outputFolder) ) {
+			java.nio.file.Files.createDirectory(outputFolder);
+		}
+		
+		java.nio.file.Files.write(outputFolder.resolve(OriginPath.getFileName().toString()), cw.toByteArray());
 	}
 }

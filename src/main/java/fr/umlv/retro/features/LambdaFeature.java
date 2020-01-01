@@ -14,7 +14,7 @@ import fr.umlv.retro.util.ByteCode;
 
 import static org.objectweb.asm.tree.AbstractInsnNode.INVOKE_DYNAMIC_INSN;
 
-public class LambdaFeature extends AbstractFeature {
+public class LambdaFeature extends Feature {
 	private final static String FEATURE_NAME = "LAMBDA";
 
 	public LambdaFeature() {

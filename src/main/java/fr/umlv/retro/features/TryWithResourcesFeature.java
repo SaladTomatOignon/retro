@@ -14,7 +14,7 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
 
 import fr.umlv.retro.util.ByteCode;
 
-public class TryWithResourcesFeature extends AbstractFeature {
+public class TryWithResourcesFeature extends Feature {
 	private final static String FEATURE_NAME = "TRY_WITH_RESOURCES";
 	private AbstractInsnNode lastCloseMethodVisited;
 

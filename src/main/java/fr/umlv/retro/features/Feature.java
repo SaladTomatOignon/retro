@@ -5,14 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.objectweb.asm.tree.ClassNode;
+
 import fr.umlv.retro.detection.Detector;
 import fr.umlv.retro.transformation.Transformer;
 
-abstract class AbstractFeature implements Transformer, Detector {
+public class Feature implements Transformer, Detector {
 	private final String name;
 	private final List<FeatureInfos> recognizedFeatures;
 	
-	AbstractFeature(String name) {
+	Feature(String name) {
 		this.name = Objects.requireNonNull(name);
 		this.recognizedFeatures = new ArrayList<FeatureInfos>();
 	}
@@ -34,5 +36,15 @@ abstract class AbstractFeature implements Transformer, Detector {
 	@Override
 	public void clear() {
 		recognizedFeatures.clear();
+	}
+
+	@Override
+	public void analyze(ClassNode cn) {
+		// Do nothing
+	}
+
+	@Override
+	public void transform(ClassNode cn) {
+		// Do nothing
 	}
 }

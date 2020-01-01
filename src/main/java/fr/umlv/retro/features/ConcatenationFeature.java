@@ -29,7 +29,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import fr.umlv.retro.util.ByteCode;
 
-public class ConcatenationFeature extends AbstractFeature {
+public class ConcatenationFeature extends Feature {
 	private final static String FEATURE_NAME = "CONCATENATION";
 	
 	public ConcatenationFeature() {

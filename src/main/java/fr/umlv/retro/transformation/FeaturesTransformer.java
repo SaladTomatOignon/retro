@@ -26,15 +26,17 @@ public class FeaturesTransformer {
 		this.transformers = Objects.requireNonNull(transformers);
 	}
 	
-	public void transform(int version) {
+	public void transform(int version, boolean force) {
 		if ( !Set.of(V1_5, V1_6, V1_7, V1_8, V9, V10, V11, V12, V13, V14).contains(version) ) {
 			throw new IllegalArgumentException("Unsupported version");
 		}
 		
 		cn.version = version;
 		
-		transformers.forEach(transformer -> {
-			transformer.transform(cn);
-		});
+		if ( force ) {
+			transformers.forEach(transformer -> {
+				transformer.transform(cn);
+			});	
+		}
 	}
 }

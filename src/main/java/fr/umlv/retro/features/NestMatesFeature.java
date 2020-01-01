@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.objectweb.asm.tree.ClassNode;
 
-public class NestMatesFeature extends AbstractFeature {
+public class NestMatesFeature extends Feature {
 	private final static String FEATURE_NAME = "NESTMATES";
 
 	public NestMatesFeature() {
