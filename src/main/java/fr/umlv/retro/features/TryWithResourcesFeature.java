@@ -3,68 +3,36 @@ package fr.umlv.retro.features;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
-import static org.objectweb.asm.tree.AbstractInsnNode.LABEL;
-import static org.objectweb.asm.tree.AbstractInsnNode.METHOD_INSN;
-import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;;
+import fr.umlv.retro.util.ByteCode;
 
 public class TryWithResourcesFeature extends AbstractFeature {
 	private final static String FEATURE_NAME = "TRY_WITH_RESOURCES";
 	private AbstractInsnNode lastCloseMethodVisited;
-	
-	private final static Predicate<AbstractInsnNode> isCloseMethod = instr -> {
-		if ( instr.getType() == METHOD_INSN ) {
-			MethodInsnNode methodInstr = (MethodInsnNode) instr;
-			
-			return methodInstr.name.equals("close");
-		}
-		 
-		return false;
-	};
-	
-	private final static Predicate<AbstractInsnNode> isAddSuppressedMethod = instr -> {
-		if ( instr.getType() == METHOD_INSN ) {
-			MethodInsnNode methodInstr = (MethodInsnNode) instr;
-			
-			return methodInstr.getOpcode() == INVOKEVIRTUAL &&
-					methodInstr.owner.equals(Type.getType(java.lang.Throwable.class).getInternalName()) &&
-					methodInstr.name.equals("addSuppressed");
-		}
-		 
-		return false;
-	};
 
 	public TryWithResourcesFeature() {
 		super(FEATURE_NAME);
 	}
 
 	@Override
-	public void transformFields(List<FieldNode> fields) {
+	public void transform(ClassNode cn) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void transformMethods(List<MethodNode> methods) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void analyze(ClassNode cn) {
 		Objects.requireNonNull(cn);
 		
+		clear();
 		cn.methods.forEach(method -> analyzeMethod(method, cn.name, cn.sourceFile));
 	}
 	
@@ -76,7 +44,8 @@ public class TryWithResourcesFeature extends AbstractFeature {
 				addFeatureInfos(new FeatureInfos(featureName(),
 						className + "." + mn.name + mn.desc,
 						sourceName + ":" + getTryCatchLine(tryCatch),
-						"try-with-ressources on " + ((MethodInsnNode)lastCloseMethodVisited).owner));
+						"try-with-ressources on " + ((MethodInsnNode)lastCloseMethodVisited).owner,
+						null));
 			}
 		});
 	}
@@ -87,10 +56,10 @@ public class TryWithResourcesFeature extends AbstractFeature {
 		
 		var nestedTryCatch = getNestedTryCatch(tryCatchBlocks, tryCatch.handler);
 		
-		if ( nestedTryCatch.isPresent() ) { // On vï¿½rifie que le tryCatch contient un autre tryCatch imbriquï¿½.
-			if ( !Objects.isNull(lastCloseMethodVisited = findInstruction(isCloseMethod, tryCatch.end, tryCatch.handler)) ) { // On vï¿½rifie qu'il y a un close() dans le finally du tryCatch initial.
-				if ( !Objects.isNull(findInstruction(isCloseMethod, nestedTryCatch.get().start, nestedTryCatch.get().end)) ) { // On vï¿½rifie qu'il y a un close() dans le try du tryCatch imbriquï¿½.
-					if ( !Objects.isNull(findInstruction(isAddSuppressedMethod, nestedTryCatch.get().handler, getNextLabel(nestedTryCatch.get().handler))) ) { // On vï¿½rifie qu'il y a un addSuppressed() dans le catch du tryCatch imbriquï¿½.
+		if ( nestedTryCatch.isPresent() ) { // On vérifie que le tryCatch contient un autre tryCatch imbriqué.
+			if ( !Objects.isNull(lastCloseMethodVisited = ByteCode.findInstruction(ByteCode.isCloseMethod, tryCatch.end, tryCatch.handler)) ) { // On vérifie qu'il y a un close() dans le finally du tryCatch initial.
+				if ( !Objects.isNull(ByteCode.findInstruction(ByteCode.isCloseMethod, nestedTryCatch.get().start, nestedTryCatch.get().end)) ) { // On vérifie qu'il y a un close() dans le try du tryCatch imbriqué.
+					if ( !Objects.isNull(ByteCode.findInstruction(ByteCode.isAddSuppressedMethod, nestedTryCatch.get().handler, ByteCode.getNextLabel(nestedTryCatch.get().handler))) ) { // On vérifie qu'il y a un addSuppressed() dans le catch du tryCatch imbriqué.
 						return true;
 					}
 				}
@@ -99,48 +68,17 @@ public class TryWithResourcesFeature extends AbstractFeature {
 		
 		return false;
 	}
-
-	private AbstractInsnNode findInstruction(Predicate<AbstractInsnNode> isInstrSatisfied, LabelNode start, LabelNode end) {
-		Objects.requireNonNull(isInstrSatisfied);
-		Objects.requireNonNull(start);
-		Objects.requireNonNull(end);
-		
-		// On parcourt les instructions de start jusqu'ï¿½ end.
-		for (AbstractInsnNode currentInst = start; !Objects.isNull(currentInst) && !currentInst.equals(end); currentInst = currentInst.getNext()) {
-			if ( isInstrSatisfied.test(currentInst) ) {
-				return currentInst;
-			}
-		}
-		
-		return null;
-	}
 	
 	private Optional<TryCatchBlockNode> getNestedTryCatch(List<TryCatchBlockNode> tryCatchBlocks, LabelNode handler) {
 		Objects.requireNonNull(tryCatchBlocks);
 		Objects.requireNonNull(handler);
 		
-		LabelNode nextLabel = getNextLabel(handler);
+		LabelNode nextLabel = ByteCode.getNextLabel(handler);
 		if ( Objects.isNull(nextLabel) ) {
 			return Optional.empty();
 		}
 		
 		return tryCatchBlocks.stream().filter(tcb -> tcb.start.equals(nextLabel)).findFirst();
-	}
-
-	private LabelNode getNextLabel(LabelNode handler) {
-		Objects.requireNonNull(handler);
-		
-		AbstractInsnNode currentInst = handler.getNext();
-		
-		while ( !Objects.isNull(currentInst) ) {
-			if ( (currentInst.getType() == LABEL) ) {
-				return (LabelNode) currentInst;
-			}
-			
-			currentInst = currentInst.getNext();
-		}
-		
-		return null;
 	}
 	
 	private int getTryCatchLine(TryCatchBlockNode tryCatch) {

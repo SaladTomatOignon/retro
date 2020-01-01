@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.LineNumberNode;
+import fr.umlv.retro.detection.Detector;
+import fr.umlv.retro.transformation.Transformer;
 
-import static org.objectweb.asm.tree.AbstractInsnNode.LINE;
-
-abstract class AbstractFeature implements FeatureTransformer, FeatureRecognizer {
+abstract class AbstractFeature implements Transformer, Detector {
 	private final String name;
 	private final List<FeatureInfos> recognizedFeatures;
 	
@@ -21,21 +19,6 @@ abstract class AbstractFeature implements FeatureTransformer, FeatureRecognizer 
 	
 	void addFeatureInfos(FeatureInfos fi) {
 		recognizedFeatures.add(Objects.requireNonNull(fi));
-	}
-	
-	int getLineInst(AbstractInsnNode instr) {
-		Objects.requireNonNull(instr);
-		
-		// On remonte jusqu'au dernier LineNumberNode rencontré.
-		while ( instr.getType() != LINE) {
-			instr = instr.getPrevious();
-			if ( Objects.isNull(instr) ) {
-				return 0;
-			}
-		}
-		
-		// On est garantis que instr est de type LineNumberNode. */
-		return ((LineNumberNode) instr).line;
 	}
 	
 	@Override

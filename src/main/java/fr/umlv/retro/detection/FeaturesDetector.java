@@ -9,14 +9,13 @@ import java.util.stream.Stream;
 import org.objectweb.asm.tree.ClassNode;
 
 import fr.umlv.retro.features.FeatureInfos;
-import fr.umlv.retro.features.FeatureRecognizer;
 
 public class FeaturesDetector {
 	private final ClassNode cn;
-	private final Collection<? extends FeatureRecognizer> recognizers;
+	private final Collection<? extends Detector> recognizers;
 	private final List<String> logs;
 	
-	FeaturesDetector(ClassNode cn, Collection<? extends FeatureRecognizer> recognizers) {
+	FeaturesDetector(ClassNode cn, Collection<? extends Detector> recognizers) {
 		this.cn = Objects.requireNonNull(cn);
 		this.recognizers = Objects.requireNonNull(recognizers);
 		
@@ -34,9 +33,7 @@ public class FeaturesDetector {
 	private void logFeature(FeatureInfos fi) {
 		Objects.requireNonNull(fi);
 		
-		logs.add(fi.getName() + " at " + fi.getClasslocation() + 
-				" (" + fi.getSourcelocation() + "): " +
-				fi.getDetails());
+		logs.add(fi.toString());
 	}
 	
 	public Stream<String> getLogs() {

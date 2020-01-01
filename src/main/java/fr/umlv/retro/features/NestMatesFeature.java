@@ -5,8 +5,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
 
 public class NestMatesFeature extends AbstractFeature {
 	private final static String FEATURE_NAME = "NESTMATES";
@@ -14,15 +12,9 @@ public class NestMatesFeature extends AbstractFeature {
 	public NestMatesFeature() {
 		super(FEATURE_NAME);
 	}
-
+	
 	@Override
-	public void transformFields(List<FieldNode> fields) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void transformMethods(List<MethodNode> methods) {
+	public void transform(ClassNode cn) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -32,12 +24,14 @@ public class NestMatesFeature extends AbstractFeature {
 		Objects.requireNonNull(cn);
 		String nm, nh;
 		
+		clear();
+		
 		if ( !(nm = lookForNestMates(cn.nestMembers)).isEmpty() ) {
-			addFeatureInfos(new FeatureInfos(featureName(), cn.name, cn.sourceFile, nm.replace("#", cn.name)));
+			addFeatureInfos(new FeatureInfos(featureName(), cn.name, cn.sourceFile, nm.replace("#", cn.name), null));
 		}
 			
 		if ( !(nh = lookForNestHost(cn.nestHostClass)).isEmpty() ) {
-			addFeatureInfos(new FeatureInfos(featureName(), cn.name, cn.sourceFile, nh));
+			addFeatureInfos(new FeatureInfos(featureName(), cn.name, cn.sourceFile, nh, null));
 		}
 	}
 	

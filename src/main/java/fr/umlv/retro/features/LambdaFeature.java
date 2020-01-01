@@ -1,16 +1,16 @@
 package fr.umlv.retro.features;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import fr.umlv.retro.util.ByteCode;
 
 import static org.objectweb.asm.tree.AbstractInsnNode.INVOKE_DYNAMIC_INSN;
 
@@ -20,21 +20,18 @@ public class LambdaFeature extends AbstractFeature {
 	public LambdaFeature() {
 		super(FEATURE_NAME);
 	}
-
+	
 	@Override
-	public void transformFields(List<FieldNode> fields) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void transformMethods(List<MethodNode> methods) {
+	public void transform(ClassNode cn) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	@Override
 	public void analyze(ClassNode cn) {
+		Objects.requireNonNull(cn);
+		
+		clear();
 		cn.methods.forEach(method -> analyzeMethod(method, cn.name, cn.sourceFile));
 	}
 
@@ -51,7 +48,7 @@ public class LambdaFeature extends AbstractFeature {
 								Arrays.stream(Type.getArgumentTypes(idInstr.desc)).map(x -> x.toString()).collect(Collectors.joining(", ", "[", "]")) +
 								" calling " + idInstr.bsmArgs[1].toString().split(" ")[0];
 				
-				addFeatureInfos(new FeatureInfos(featureName(), className + "." + mn.name + mn.desc, sourceName + ":" + getLineInst(idInstr), details));
+				addFeatureInfos(new FeatureInfos(featureName(), className + "." + mn.name + mn.desc, sourceName + ":" + ByteCode.getLineInst(idInstr), details, idInstr));
 			}
 		});
 	}

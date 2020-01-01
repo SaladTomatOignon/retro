@@ -6,24 +6,22 @@ import java.util.Set;
 
 import org.objectweb.asm.tree.ClassNode;
 
-import fr.umlv.retro.features.FeatureRecognizer;
-
 public class FeaturesDetectorBuilder {
 	private ClassNode cn;
-	private final Set<FeatureRecognizer> recognizers;
+	private final Set<Detector> recognizers;
 	
 	public FeaturesDetectorBuilder(ClassNode cn) {
 		this.cn = Objects.requireNonNull(cn);
-		this.recognizers = new HashSet<FeatureRecognizer>();
+		this.recognizers = new HashSet<Detector>();
 	}
 	
-	public FeaturesDetectorBuilder append(FeatureRecognizer recognizer) {
+	public FeaturesDetectorBuilder append(Detector recognizer) {
 		recognizers.add(Objects.requireNonNull(recognizer));
 		
 		return this;
 	}
 	
-	public FeaturesDetectorBuilder remove(FeatureRecognizer recognizer) {
+	public FeaturesDetectorBuilder remove(Detector recognizer) {
 		recognizers.remove(Objects.requireNonNull(recognizer));
 		
 		return this;
