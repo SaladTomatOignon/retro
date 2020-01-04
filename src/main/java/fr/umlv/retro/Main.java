@@ -25,8 +25,24 @@ import fr.umlv.retro.transformation.FeaturesTransformerBuilder;
 import fr.umlv.retro.transformation.Transformer;
 import fr.umlv.retro.util.Files;
 
+import static org.objectweb.asm.Opcodes.V1_1;
+import static org.objectweb.asm.Opcodes.V1_2;
+import static org.objectweb.asm.Opcodes.V1_3;
+import static org.objectweb.asm.Opcodes.V1_4;
+import static org.objectweb.asm.Opcodes.V1_5;
+import static org.objectweb.asm.Opcodes.V1_6;
+import static org.objectweb.asm.Opcodes.V1_7;
+import static org.objectweb.asm.Opcodes.V1_8;
+import static org.objectweb.asm.Opcodes.V9;
+import static org.objectweb.asm.Opcodes.V10;
+import static org.objectweb.asm.Opcodes.V11;
+import static org.objectweb.asm.Opcodes.V12;
+import static org.objectweb.asm.Opcodes.V13;
+import static org.objectweb.asm.Opcodes.V14;
+
 public class Main {
 	private final static Map<String, Class<? extends Feature>> featuresMap;
+	private final static Map<Integer, Integer> versionNumber;
 	static {
         Map<String, Class<? extends Feature>> tmp = new HashMap<String, Class<? extends Feature>>();
         tmp.put("try-with-resources", TryWithResourcesFeature.class);
@@ -35,6 +51,18 @@ public class Main {
         tmp.put("concatenation", ConcatenationFeature.class);
         tmp.put("record", RecordFeature.class);
 		featuresMap = Collections.unmodifiableMap(tmp);
+	}
+	
+	static {
+        Map<Integer, Integer> tmp = new HashMap<Integer, Integer>();
+        tmp.put(1, V1_1);	tmp.put(2, V1_2);
+        tmp.put(3, V1_3);	tmp.put(4, V1_4);
+        tmp.put(5, V1_5);	tmp.put(6, V1_6);
+        tmp.put(7, V1_7);	tmp.put(8, V1_8);
+        tmp.put(9, V9);		tmp.put(10, V10);
+        tmp.put(11, V11);	tmp.put(12, V12);
+        tmp.put(13, V13);	tmp.put(14, V14);
+        versionNumber = Collections.unmodifiableMap(tmp);
 	}
 	
 	private static Feature getFeature(String featureName) {
@@ -125,13 +153,15 @@ public class Main {
 			features = featuresMap.keySet().stream().map(Main::getFeature).collect(Collectors.toList());
 		}
 		
-		// On donne uniquement les infos.
-		if ( commandLine.hasOption("info") ) {
+		if ( commandLine.hasOption("help") ) {
+			ArgsParser.displayHelp();
+		} else if ( commandLine.hasOption("info") ) {
+			// On donne uniquement les infos.
 			showInfosFiles(files.values(), features);
 		} else {
 			// Sinon on transforme.
 			try {
-				retroFiles(files, features, Integer.parseInt(commandLine.getOptionValue("target")), commandLine.hasOption("force"));
+				retroFiles(files, features, versionNumber.getOrDefault(Integer.parseInt(commandLine.getOptionValue("target")), Integer.parseInt(commandLine.getOptionValue("target"))), commandLine.hasOption("force"));
 			} catch (NumberFormatException e) {
 				throw new IllegalArgumentException("target version must be a number");
 			}
