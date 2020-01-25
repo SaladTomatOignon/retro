@@ -2,8 +2,6 @@ package fr.umlv.retro.options;
 
 import java.util.Objects;
 
-import org.apache.commons.cli.*;
-
 public class ArgsParser {
 	
 	/* Parse les options de 'args' et renvoie le CommandLine associé. */
@@ -64,7 +62,7 @@ public class ArgsParser {
 
 	private static Option optionTarget() {
 		Option opt = new Option("t", "target", true, "Target version");
-		opt.setRequired(true);
+		opt.setRequired();
 		
 		return opt;
 	}
