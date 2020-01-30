@@ -8,7 +8,7 @@ public class Option {
 	private final String description;
 	private final boolean hasArg;
 	private boolean hasArgs;
-	private boolean Required;
+	private boolean required;
 	private char sep;
 
 	public Option(String opt, String longOpt, boolean hasArg, String description) {
@@ -20,24 +20,53 @@ public class Option {
 		this.longOpt = longOpt;
 		this.description = description;
 		this.hasArg = hasArg;
-
+	}
+	
+	public String getOptName() {
+		return opt;
+	}
+	
+	public String getLongOptName() {
+		return longOpt;
+	}
+	
+	public boolean hasArg() {
+		return hasArg;
+	}
+	
+	public boolean hasArgs() {
+		return hasArgs;
+	}
+	
+	public char separator() {
+		return sep;
+	}
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public boolean isRequired() {
+		return required;
 	}
 
 	public void setRequired() {
-		Required = true;
+		required = true;
 	}
 
 	private void setSeparator(char sep) {
 		this.sep = sep;
 	}
 
-	private void hasArgs() {
+	private void setHasArgs() {
 		this.hasArgs = true;
 	}
+	
 	public static Option.Builder builder(String opt) {
 		var builder = new Builder(opt); 
 		return builder;
 	}
+	
 	public static class Builder {
 		private String opt;
 		private String longOpt;
@@ -83,12 +112,11 @@ public class Option {
 			var option = new Option(opt, longOpt, hasArg, desc);
 			if (hasArgs) {
 				// l'option peut avoir plusieurs arguments
-				option.hasArgs();
+				option.setHasArgs();
+				option.setSeparator(sep);
 			}
 			return option;
 		}
 	}
-
-	
 
 }

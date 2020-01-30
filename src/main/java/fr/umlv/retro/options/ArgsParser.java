@@ -9,14 +9,12 @@ public class ArgsParser {
 		Objects.requireNonNull(args);
 		
 		Options options = getOptions();
-		CommandLineParser parser = new DefaultParser();
+		CommandLineParser parser = new CommandLineParser();
 		CommandLine cl = null;
 		
-		try {
-			cl = parser.parse(options, args);
-		} catch (ParseException e) {
-			System.out.println("Error while parsing arguments\n" + e.getMessage());
-			System.exit(1);
+		cl = parser.parse(options, args);
+		if ( !cl.isValid(options) ) {
+			throw new IllegalArgumentException("Missing required option");
 		}
 		
 		return cl;
@@ -24,7 +22,7 @@ public class ArgsParser {
 	
 	public static void displayHelp() {
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("retro", "Retro tool : Convert class and jar files to an older version.\n ", ArgsParser.getOptions(), "\nAuthors : MILED Amany, WADAN Samy", true);
+		formatter.printHelp("retro", "Retro tool : Convert class and jar files to an older version.\n ", ArgsParser.getOptions(), "\nAuthors : MILED Amany, WADAN Samy");
 	}
 	
 	private static Options getOptions() {

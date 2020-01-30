@@ -3,7 +3,6 @@ package fr.umlv.retro;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,7 +147,7 @@ public class Main {
 		
 		// On récupère les features données en arguments.
 		if ( commandLine.hasOption("feature") ) {
-			features = Arrays.stream(commandLine.getOptionValues("feature")).map(Main::getFeature).collect(Collectors.toList());
+			features = commandLine.getOptionValues("feature").stream().map(Main::getFeature).collect(Collectors.toList());
 		} else {
 			features = featuresMap.keySet().stream().map(Main::getFeature).collect(Collectors.toList());
 		}
