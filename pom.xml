@@ -14,7 +14,57 @@
 	<properties>
 		<maven.compiler.source>13</maven.compiler.source>
 		<maven.compiler.target>13</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<release>${java.version}</release>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<compilerArgs>
+						<compilerArg>-Xlint:all</compilerArg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>fr.umlv.Retro.App</mainClass>
+							<classpathLayoutType>custom</classpathLayoutType>
+               				<customClasspathLayout>$${artifact.groupId}.$${artifact.artifactId}-$${artifact.version}$${dashClassifier?}.$${artifact.extension}</customClasspathLayout>
+						</manifest>
+					</archive>
+					<finalName>${project.artifactId}</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.quarkus</groupId>
+				<artifactId>quarkus-maven-plugin</artifactId>
+				<version>1.2.0.Final</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<finalName>${project.artifactId}-server</finalName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
@@ -36,7 +86,16 @@
 			<version>5.6.0-M1</version>
 			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy</artifactId>
+			<version>1.2.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jsonb</artifactId>
+			<version>1.2.0.Final</version>
+		</dependency>
 	</dependencies>
 
 </project>
