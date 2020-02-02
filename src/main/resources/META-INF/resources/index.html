@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<div id="root"> </div>
+	<head>
+		<link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all"> 
+		<script src="js/jquery.js"></script>
+		<script src="js/bootstrap.js"></script>
+		<script src="js/angular.js"></script>
+		<script src="js/form.js"></script>
+	
+	</head>
+	<body>
+		<header>
+			<div class="jumbotron jumbotron-fluid">
+  				<div class="container">
+   					<h1>RETRO PROJECT</h1>
+   				</div>
+			</div>						
+		</header>
+		<main>
+			<div class="card">
+  				<div class="card-body">
+ 
+  					<!--Browse File  -->
+				<div class="input-group mb-3">
+							<div class="input-group-prepend">
+									<span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+							</div>
+							<div class="custom-file">
+									<input type="file" class="custom-file-input" id="files" aria-describedby="inputGroupFileAddon01" multiple="multiple" accept=".class,.jar">
+									<label class="custom-file-label" for="files">Choose files</label>
+							</div>
+					</div>
+					
+			<!--Convert files and show detected features buttons-->
+			
+					
+						<!--Convert Files-->
+						<button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target=".bd-example-modal-xl">Show detected features</button>
+						<!--Show detected features-->
+						<a class="btn btn-outline-secondary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+								Convert Files
+						</a>
+						<!--Show information about detected features -->
+							<div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
+								<div class="modal-dialog modal-xl" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+        									<h5 class="modal-title" id="exampleModalLabel">Detected features</h5>
+        									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          										<span aria-hidden="true">&times;</span>
+        									</button>
+   									  	</div>
+								      	<div class="modal-body">
+								        	Ici on va afficher les informations des features detectes.... 
+								     	</div>
+								      	<div class="modal-footer">
+								        	<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+								      </div>
+									</div>
+								</div>
+							</div>
+						
+
+
+
+ 				</div>
+			</div>
+			
+						<!-- Form Content-->
+						
+						<div class="collapse" id="collapseExample">
+							<div class="card card-body">
+
+							<!--  Choose Features-->
+							<div class="card">
+							  <h5 class="card-header"><center>Features</center></h5>
+							  <div class="card-body">
+							  	<!--TWR-->
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="TWR">
+										<label class="form-check-label" for="TWR">
+											Try with resources
+										</label>
+								</div>
+								<!--Lambda-->
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="Lambda">
+									<label class="form-check-label" for="Lambda">
+										Lambda
+									</label>
+								</div>
+								<!--Concatenation-->
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="Concatenation">
+									<label class="form-check-label" for="Concatenation">
+										Concatenation
+									</label>
+								</div>
+								<!--Nestmate-->
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="Nestmate">
+									<label class="form-check-label" for="Nestmate">
+										Nestmate
+									</label>
+								</div>
+								<!--Record-->
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="Record">
+									<label class="form-check-label" for="Record">
+										Record
+									</label>
+								</div>
+							    
+							  </div>
+							</div>
+							
+
+							<div class="card">
+							  <h5 class="card-header"><center>Options</center> </h5>
+							  <div class="card-body">
+
+							    <!--show options-->
+									<!--Force-->
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="Force">
+										<label class="form-check-label" for="Force">
+											Force
+										</label>
+										<div class="collapse" id="collapseExample">
+			  								<div class="card card-body">
+												<!--Target version-->
+												<!--Choose version -->
+												<div class="input-group mb-3">
+													<select class="custom-select" id="Target_version">
+														<option value="5">Java 5</option>
+														<option value="6">Java 6</option>
+														<option value="7">Java 7</option>
+														<option value="8">Java 8</option>
+														<option value="9">Java 9</option>
+														<option value="10">Java 10</option>
+														<option value="11">Java 11</option>
+														<option value="12">Java 12</option>
+														<option selected value="13">Java 13</option>
+													</select>
+													<div class="input-group-append">
+													<label class="input-group-text" for="Target_version">Target version</label>
+													</div>
+												</div>
+											</div>
+												</div>
+									</div>
+									
+								    <!--Validate button -->
+
+									<div><center>
+
+									  <div >
+									    <button class="btn btn-outline-secondary" type="button" onclick="init()" id="button-addon2">Download</button>
+									  </div></center>
+									</div>
+
+								  </div>
+								</div>
+							</div>
+						</div>
+				
+			
+			
+
+
+	
+		</main>
+		<footer>
+			<div class="jumbotron jumbotron-fluid">
+  				<div class="container">
+   					<h5>Amany MILED</h5>
+   					<h5>Samy WADAN</h5>
+   				</div>
+			</div>	
+
+		
+		</footer>
+	
+	</body>
+</html>
